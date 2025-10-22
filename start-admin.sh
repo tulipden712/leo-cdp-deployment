@@ -4,7 +4,7 @@ set -euo pipefail
 # === CONFIGURATION ===
 LEO_CDP_FOLDER="/build/cdp-instance"
 BUILD_VERSION="v_0.9.0"
-HTTP_ROUTER_KEY="leocdp-admin"
+HTTP_ROUTER_KEY="leocdp_admin"
 JAR_MAIN="leo-main-starter-${BUILD_VERSION}.jar"
 
 JVM_PARAMS="-Xms256m -Xmx1500m -XX:+TieredCompilation -XX:+UseCompressedOops -XX:+DisableExplicitGC -XX:+UseNUMA -server"

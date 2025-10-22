@@ -3,12 +3,12 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # ----------------------------------------------------------
-# 🧠 upgrade-database.sh
+# 🧠 upgrade-leocdp.sh
 # Drop a collection in ArangoDB and run LEO CDP system upgrade
 # ----------------------------------------------------------
 
 # Usage:
-# ./upgrade-database.sh <host> <port> <username> <password> <database> <collection>
+# ./ upgrade-leocdp.sh <host> <port> <username> <password> <database> <collection>
 
 if [[ $# -lt 6 ]]; then
   echo "Usage: $0 <host> <port> <username> <password> <database> <collection>"
@@ -28,7 +28,7 @@ COLLECTION_NAME="$6"
 # --- Constants ---
 BUILD_VERSION="v_0.9.0"
 JAR_MAIN="leo-main-starter-${BUILD_VERSION}.jar"
-LOG_FILE="./upgrade-database.log"
+LOG_FILE="./ upgrade-leocdp.log"
 
 timestamp() { date '+%Y-%m-%d %H:%M:%S'; }
 log() { echo "[$(timestamp)] $*" | tee -a "$LOG_FILE"; }

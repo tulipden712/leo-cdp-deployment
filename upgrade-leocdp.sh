@@ -89,14 +89,5 @@ esac
 
 # --- Run upgrade ---
 log "🚀 Running LEO CDP system upgrade..."
-set +e
-java -jar "$JAR_MAIN" upgrade-system | tee -a "$LOG_FILE"
-UPGRADE_EXIT_CODE=${PIPESTATUS[0]}
-set -e
-
-if [[ $UPGRADE_EXIT_CODE -ne 0 ]]; then
-  log "❌ Upgrade failed with exit code ${UPGRADE_EXIT_CODE}."
-  exit $UPGRADE_EXIT_CODE
-fi
-
-log "🎉 LEO CDP system upgrade completed successfully!"
+java -jar "$JAR_MAIN" upgrade-system >> "$LOG_FILE" 2>&1
+log "🎉 LEO CDP system upgrade completed!"

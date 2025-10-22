@@ -33,3 +33,4 @@ devops-script/kafka-docker-production/data
 # must exclude this to avoid security risks
 leocdp-metadata.properties
 configs/PRO-database-configs.json
+configs/*

@@ -2146,7 +2146,7 @@ AQL_LIST_AGENTS_WITH_FILTER =>
 
 AQL_LIST_ALL_ACTIVE_AGENTS =>
 	FOR e in cdp_agent 
-	FILTER LENGTH(e.configs['service_api_key']) > 0 AND e.status == 1
+	FILTER e.status == 1
 	RETURN e
 ;
 

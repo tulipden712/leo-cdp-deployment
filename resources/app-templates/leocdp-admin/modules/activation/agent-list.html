@@ -90,8 +90,8 @@
 			<div class="col-md-12">
 				<div class="form-group">
 					<div id="<%- id %>_api_key_div" >
-						<label id="<%- id %>_api_key_label" for="<%- id %>_api_key"> API Key </label>
-						<input id="<%- id %>_api_key"  autocomplete="off" type="text" value="<%- service_api_key %>" class="form-control" placeholder="API key" disabled >
+						<label id="<%- id %>_dag_id_label" for="<%- id %>_api_key"> Apache Airflow DAG ID </label>
+						<input id="<%- id %>_dag_id"  autocomplete="off" type="text" value="<%- dagId %>" class="form-control" placeholder="Apache Airflow DAG ID" disabled >
 						<br>
 					</div>
 					<div id="<%- id %>_api_url_div" >
@@ -171,10 +171,10 @@
 				   	</div>
 				</div>
 				<div class="row form-group">
-					<label class="control-label col-md-3" for="dataServiceStatus" > Status </label>
+					<label class="control-label col-md-3" for="agentStatus" > Status </label>
 					<div class="col-md-9 float-left" >
 				    	<label class="checkbox-inline control-label" >
-					      	<input id="dataServiceStatus" type="checkbox" > Ready
+					      	<input id="agentStatus" type="checkbox" > Ready
 					    </label>
 				   	</div>
 				</div>

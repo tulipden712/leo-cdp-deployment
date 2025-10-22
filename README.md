@@ -1,24 +1,6 @@
-# LEO CDP Free Edition
+# LEO CDP Deployment
 
-**LEO Customer Data Platform (CDP)** – Free Edition repository.
-
-This repository contains everything needed to run a local or production instance of LEO CDP, including configuration templates, setup scripts, JAR files, and supporting libraries.
-
----
-
-## Table of Contents
-
-1. [Overview](#overview)
-2. [Repository Structure](#repository-structure)
-3. [Basic Deployment Flow](#basic-deployment-flow)
-4. [Prerequisites](#prerequisites)
-5. [Configuration](#configuration)
-6. [Setup Scripts](#setup-scripts)
-7. [Running LEO CDP](#running-leo-cdp)
-8. [Security Recommendations](#security-recommendations)
-9. [Source Code](#source-code)
-
----
+**LEO Customer Data Platform (CDP)** — *Free Edition for on-premise or cloud environments.*
 
 ## Overview
 
@@ -33,167 +15,145 @@ LEO CDP Free Edition provides a complete environment to manage customer data, in
 * Messaging through Kafka or local queues
 * Pre-packaged JAR files for core services and jobs
 
-The repository supports **both local development** and **production deployment**.
-
 ---
 
-## Repository Structure
+## 📁 Repository Structure
+
 
 ```
 .
-├── configs/                         # Configuration templates and example metadata
-├── deps/                            # Supporting libraries
-├── devops-script/                   # Utility scripts for deployment and maintenance
-├── airflow-dags/                    # Example Airflow DAGs
-├── resources/                       # Supporting resources
-├── public/                          # Frontend files and static content
-├── static-data/                      # Example static datasets
-├── *.jar                             # Pre-built JARs for LEO services:
-│   ├── leo-main-starter-v_0.9.0.jar
-│   ├── leo-data-processing-starter-v_0.9.0.jar
-│   ├── leo-observer-starter-v_0.9.0.jar
-│   └── leo-scheduler-starter-v_0.9.0.jar
-├── *.sh                              # Setup and startup scripts
-├── sample-leocdp-metadata.properties # Config template
-├── leocdp-metadata.properties        # Generated production metadata
-├── README.md                         # This file
-└── NOTES-FOR-LOCAL-SETUP.md / NOTES-FOR-NEW-SETUP.md
+├── airflow-dags/                     # Example Airflow DAGs for data pipelines
+├── chrome-ext/                       # Chrome extensions for tracking and event testing
+├── configs/                          # Configuration of LEO CDP services
+├── data/                             # Local or exported data files
+├── deps/                             # Library dependencies
+├── devops-script/                    # Scripts for maintenance and automation
+├── docs/                             # Documentation and diagrams
+├── public/                           # Static resources for Admin UI
+├── resources/                        # Additional assets or sample files
+├── script-new-installation/          # Main installation scripts for system setup
+│   ├── install-certbot.sh            # Install Let's Encrypt SSL certs
+│   ├── install-database.sh           # Install ArangoDB 3.11+
+│   ├── install-java.sh               # Install Amazon Corretto / OpenJDK 11
+│   ├── install-nginx.sh              # Install stable Nginx reverse proxy
+│   └── install-redis.sh              # Install Redis for caching and job state
+├── static-data/                      # Example static data sets
+│
+├── leo-data-processing-starter-v_0.9.0.jar
+├── leo-main-starter-v_0.9.0.jar
+├── leo-observer-starter-v_0.9.0.jar
+├── leo-scheduler-starter-v_0.9.0.jar
+│
+├── leocdp-metadata.properties        # Active runtime metadata config
+├── leocdp-metadata-tpl.properties    # Template metadata configuration
+│
+├── run-database-backup-restore.sh    # Backup and restore ArangoDB
+├── run-database-upgrade.sh           # Schema upgrade utility
+│
+├── setup-leocdp-database.sh          # Initialize CDP database
+├── setup-leocdp-metadata.sh          # Generate metadata configuration file
+│
+├── start-admin.sh                    # Start Admin service
+├── start-observer.sh                 # Start Data Hub / Observer service
+├── start-data-connector-jobs.sh      # Start background ETL/sync jobs
+├── stop-server.sh                    # Stop all running CDP services
+│
+└── README.md
 ```
 
 ---
 
-## Basic Deployment Flow
+## ⚙️ System Requirements
 
-![leocdp-basic-deployment-flow](docs/leocdp-basic-deployment-flow.png "leocdp-basic-deployment-flow")
-
-This architecture illustrates the standard deployment flow for **LEO CDP**, showing how the system components interact across internal networks, APIs, and user interfaces.
-
-The deployment typically involves **three main servers (or containers)** connected through secure TCP ports, fronted by an HAProxy or Nginx layer for routing and isolation.
-
-### 🔹 Core Components
-
-| Component                    | Description                                                                                                                        | Example Host / Port                        |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| **Data Hub API**             | Collects and processes data from external sources such as Google, Facebook, Zalo, websites, and internal apps.                     | `datahub.example.com` → `192.168.0.2:9080` |
-| **Admin CDP**                | The management dashboard for CDP administrators and business users. Handles analytics, campaign setup, and customer data policies. | `admin.example.com` → `192.168.0.3:9070`   |
-| **LEO Bot Service**          | AI chatbot and content generation engine integrated with the Admin CDP for real-time engagement.                                   | `bot.example.com` → `192.168.0.3:8888`     |
-| **Core Database (ArangoDB)** | The main data store for user profiles, events, and configurations.                                                                 | `192.168.0.5:8600`                         |
-| **Data Backup Folder**       | Stores scheduled backups of the database for redundancy and recovery.                                                              | Cloud or mounted storage                   |
-
-### 🔹 Networking & Routing
-
-* All external and internal traffic passes through **HAProxy / Nginx Proxy**, which routes based on DNS names.
-* Example routing configuration:
-
-  ```
-  datahub.example.com  → 192.168.0.2:9080
-  admin.example.com    → 192.168.0.3:9070
-  bot.example.com      → 192.168.0.3:8888
-  ```
-
-### 🔹 Authentication
-
-* **OpenID Connect (OIDC)** handles authentication between Admin CDP, LEO Bot, and connected third-party systems.
-
-### 🔹 Notes
-
-> The above IPs and domains are **examples only**.
-> Replace them with your **real IP addresses and DNS records** when deploying to production.
+| Component     | Requirement                              |
+| ------------- | ---------------------------------------- |
+| OS            | Ubuntu 22.04 LTS or higher               |
+| Java          | Amazon Corretto 11 *(required)*         |
+| Redis         | Redis 6+ *(required)*                    |
+| Database      | ArangoDB 3.11+                           |
+| Reverse Proxy | Nginx (latest stable)                    |
+| Shell         | Bash 5.0+                                |
+| Access        | Dedicated non-root user for all services |
 
 ---
 
-## Prerequisites
+## 🧩 Installation Workflow
 
-Before setting up **LEO CDP**, ensure the following requirements are met:
+All installation scripts are located in:
+`script-new-installation/`
 
-* **Operating System:** Linux environment (recommended: **Ubuntu 22.04 LTS**).
-* **Java Runtime:** **Java 11 (Amazon Corretto or OpenJDK)** must be installed and available in your system path.
-* **Shell Environment:** Scripts are written for **Bash** (`#!/bin/bash`).
-* **Internet Access:** Required for fetching resources from CDNs and connecting to the optional **LEO Bot API**.
-
-  * To deploy **LEO Bot**, refer to: [https://github.com/trieu/leo-bot](https://github.com/trieu/leo-bot)
+Run **each step in order** depending on the deployment context (fresh install vs existing environment).
 
 ---
 
-## Configuration
+### 1️⃣ Create Dedicated System User
 
-1. **Template File:** `sample-leocdp-metadata.properties`
-2. **Production Config:** `leocdp-metadata.properties` (generated via `setup-leocdp-metadata.sh`)
+All LEO CDP services must run under a **non-root user** for security and process isolation.
 
-Key sections:
-
-* **Admin Setup:** Superadmin email, admin dashboard and WebSocket domains, LEO Bot API
-* **SMTP:** Mail server configuration
-* **Database:** Default DB, backup path, period, retention
-* **CDP Defaults:** Runtime environment, build version, profile merge strategy, data models, CDN
-
-**Note:** The production metadata file is added to `.gitignore` automatically to avoid committing sensitive info.
+```bash
+sudo useradd cdpsysuser -s /bin/bash -p '*'
+sudo passwd -d cdpsysuser
+sudo usermod -aG sudo cdpsysuser
+echo 'cdpsysuser ALL=(ALL) NOPASSWD: ALL' | sudo tee -a /etc/sudoers >/dev/null
+```
 
 ---
 
-## Setup Scripts
+### 2️⃣ Configure SSH Access for the User
 
-### 1. `setup-leocdp-metadata.sh`
+```bash
+sudo su cdpsysuser
+sudo mkdir -p /home/cdpsysuser
+cd /home/cdpsysuser
+sudo chown -R cdpsysuser:cdpsysuser /home/cdpsysuser
+mkdir .ssh
+nano .ssh/authorized_keys
+```
 
-Generates `leocdp-metadata.properties` from the template.
+> Paste your **SSH public key** here to enable passwordless access.
+> This user will be used for deployment, upgrades, and service management.
 
-**Features:**
+---
 
-* Interactive prompts for all required fields
-* Default values for backup periods and logo if left empty
-* Automatically updates placeholders in template
-* Adds generated file to `.gitignore`
+### 3️⃣ Install Core Services and Dependencies
 
-**Usage:**
+All commands should be executed as **root** or with `sudo`, before switching to `cdpsysuser`.
+
+```bash
+cd script-new-installation
+sudo bash install-java.sh        # Install Java (required)
+sudo bash install-redis.sh       # Install Redis (required)
+sudo bash install-database.sh    # Install ArangoDB
+sudo bash install-nginx.sh       # Install Nginx (reverse proxy)
+sudo bash install-certbot.sh     # Install Let's Encrypt SSL (optional)
+```
+
+---
+
+### 4️⃣ Switch to the CDP System User
+
+```bash
+sudo su - cdpsysuser
+cd /path/to/LEO-CDP-FREE-EDITION
+```
+
+Generate configuration metadata:
 
 ```bash
 bash setup-leocdp-metadata.sh
 ```
 
----
-
-### 2. `setup-leocdp-instance.sh` / `setup-leocdp-system.sh`
-
-Initializes the CDP system:
-
-* Prompts for superadmin password securely (masked input)
-* Confirms password to prevent typos
-* Runs system setup via the main JAR (`leo-main-starter-v_0.9.0.jar`)
-
-**Usage:**
+Initialize the database:
 
 ```bash
-bash setup-leocdp-system.sh
+bash setup-leocdp-database.sh
 ```
 
 ---
 
-### 3. Startup & Maintenance Scripts
+### 5️⃣ Start CDP Services
 
-| Script                         | Purpose                             |
-| ------------------------------ | ----------------------------------- |
-| `start-admin.sh`               | Start Admin Dashboard               |
-| `start-observer.sh`            | Start Data Hub / Observer interface |
-| `start-data-connector-jobs.sh` | Start data processing jobs          |
-| `stop-server.sh`               | Stop all running LEO CDP services   |
-
----
-
-## Running LEO CDP
-
-1. Generate production metadata:
-
-```bash
-bash setup-leocdp-metadata.sh
-```
-
-2. Initialize system with superadmin credentials:
-
-```bash
-bash setup-leocdp-system.sh
-```
-
-3. Start core services:
+Run the services in sequence under `cdpsysuser`:
 
 ```bash
 bash start-admin.sh
@@ -201,20 +161,80 @@ bash start-observer.sh
 bash start-data-connector-jobs.sh
 ```
 
-4. Access Admin Dashboard at the domain configured in `leocdp-metadata.properties`.
+To stop all services:
+
+```bash
+bash stop-server.sh
+```
 
 ---
 
-## Security Recommendations
+## 🧰 Maintenance Operations
 
-* Use **strong superadmin passwords**
-* Keep `leocdp-metadata.properties` private and out of version control
-* Enable TLS/SSL for all admin and API domains
-* Rotate secrets regularly and backup your database
-* Use secure SMTP credentials
+**Backup / Restore Database**
 
-## Source Code
+```bash
+bash run-database-backup-restore.sh
+```
 
-You can find the full source code and latest updates for the **LEO CDP Framework** on GitHub at the link below:
+**Upgrade Database Schema**
 
-👉 [https://github.com/trieu/leo-cdp-framework](https://github.com/trieu/leo-cdp-framework)
+```bash
+bash run-database-upgrade.sh
+```
+
+**Logs**
+
+* All upgrade logs → `upgrade-leocdp.log`
+* Individual service logs are created per JAR when started
+
+---
+
+## 🔐 Security & Hardening
+
+* Never run CDP JARs as `root`
+* Use `ufw` or a cloud firewall to restrict open ports
+* Ensure SSL termination (Certbot or reverse proxy)
+* Keep Redis and ArangoDB access limited to internal network
+* Rotate SSH keys and database passwords periodically
+
+---
+
+## 🌐 References
+
+* **Framework:** [https://github.com/trieu/leo-cdp-framework](https://github.com/trieu/leo-cdp-framework)
+* **LEO Bot (AI Assistant):** [https://github.com/trieu/leo-bot](https://github.com/trieu/leo-bot)
+
+---
+
+## ✅ Quick Deployment Summary
+
+For a **fresh Ubuntu 22.04** server:
+
+```bash
+# 1. Create dedicated system user
+sudo useradd cdpsysuser -s /bin/bash -p '*'
+sudo passwd -d cdpsysuser
+sudo usermod -aG sudo cdpsysuser
+echo 'cdpsysuser ALL=(ALL) NOPASSWD: ALL' | sudo tee -a /etc/sudoers >/dev/null
+
+# 2. Install dependencies
+cd script-new-installation
+sudo bash install-java.sh
+sudo bash install-redis.sh
+sudo bash install-database.sh
+sudo bash install-nginx.sh
+
+# 3. Switch to CDP user and configure
+sudo su - cdpsysuser
+cd /path/to/LEO-CDP-FREE-EDITION
+bash setup-leocdp-metadata.sh
+bash setup-leocdp-database.sh
+
+# 4. Start services
+bash start-admin.sh
+bash start-observer.sh
+bash start-data-connector-jobs.sh
+```
+
+Access the **Admin Dashboard** at the configured domain.

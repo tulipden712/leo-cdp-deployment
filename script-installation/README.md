@@ -1,4 +1,0 @@
-# LEO CDP installation scripts 
-
-
-

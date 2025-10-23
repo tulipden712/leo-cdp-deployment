@@ -1,7 +1,6 @@
-# LEO CDP New Installation 
+# LEO CDP New Installation
 
-## 
+## Setup Guides
 
-leocdp-dev-server-setup.md
-
-leocdp-multi-server-setup.md
+- [Single Server Setup (Development)](./leocdp-dev-server-setup.md)
+- [Multi Server Setup (Production)](./leocdp-multi-server-setup.md)

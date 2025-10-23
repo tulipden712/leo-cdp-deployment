@@ -22,6 +22,8 @@ It’s ideal for **local testing, development, or proof-of-concept** installatio
 
 ### 🧱 Architecture Overview
 
+![LEO CDP Deployment Flow](leocdp-deployment-for-dev.png)
+
 In development mode, **all services** run on one host:
 
 | Service                  | Role                                                   | Port        | Example URL                         |
@@ -99,15 +101,88 @@ This script will generate `leocdp-metadata.properties` based on prompts such as:
 Example result:
 
 ```properties
-db.host=localhost
-db.port=8529
-redis.host=localhost
-redis.port=6379
-admin.domain=localhost
-observer.domain=localhost
-bot.domain=localhost
-runtime.env=dev
-backup.path=/home/cdpsysuser/backups
+
+# BEGIN ########################## REQUIRED METADATA for Admin Setup ##############################
+
+##### ##### ##### Super Admin Email, the account that can manage the entire CDP. 
+##### The password for the super admin is set when running setup-new-leocdp.sh
+superAdminEmail=trieu@leocdp.com
+
+##### ##### ##### Data Hub for Data Observers ##### ##### ##### #####
+httpObserverDomain=obs.example.com
+
+##### ##### ##### LEO Bot for FAQ and Content Creation ##### ##### ##### #####
+httpLeoBotDomain=leobot.example.com
+httpLeoBotApiKey=123456
+
+##### ##### ##### Admin Dashboard ##### ##### #####
+httpAdminDomain=leocdp.example.com
+webSocketDomain=leocdp.example.com
+adminLogoUrl=https://cdn.jsdelivr.net/gh/USPA-Technology/leo-cdp-static-files@latest/images/leo-cdp-logo.png 
+
+##### ##### ##### SMTP / Email Server ##### ##### #####
+smtpHost=
+smtpPort=
+smtpUser=
+smtpPassword=
+smtpFromAddress=
+smtpFromName=CDP Admin
+smtpTls=true
+
+##### ##### ##### Default CDP Database ##### ##### #####
+mainDatabaseConfig=cdpDbConfigs
+systemDatabaseConfig=cdpDbConfigs
+
+##### ##### ##### Database Backup Configurations ##### ##### #####
+databaseBackupPeriodHours=24
+databaseBackupRetentionDays=7
+databaseBackupPath=./backup_database
+
+# END ########################## REQUIRED METADATA for Admin Setup ##############################
+
+############################## DEFAULT METADATA for CDP ##############################
+runtimeEnvironment=PRO
+minifySuffix=-min
+buildEdition=PRO
+buildVersion=v_0.9.0
+
+############################################################                  |
+profileMergeStrategy=manually
+
+##### ##### ##### CDN for Static Files ##### ##### #####
+httpStaticDomain=cdn.jsdelivr.net/gh/USPA-Technology/leo-cdp-static-files@v0.9
+
+##### ##### ##### Data Model Metadata ##### ##### #####
+industryDataModels=COMMERCE,MEDIA,SERVICE,FINANCE
+
+##### ##### ##### Runtime Path for Config Files ##### ##### #####
+runtimePath=.
+pathMaxmindDatabaseFile=data/GeoIP2-City-Asia-Pacific.mmdb
+
+##### ##### ##### Default HTTP Routers ##### ##### #####
+httpRoutingConfigAdmin=leocdp-admin
+httpRoutingConfigObserver=datahub
+
+##### ##### ##### Global System Configurations ##### ##### #####
+messageQueueType=local
+enableCachingViewTemplates=true
+
+##### ##### ##### Apache Kafka Configurations ##### ##### #####
+kafkaBootstrapServer=localhost:9092
+kafkaTopicEvent=LeoCdpEvent
+kafkaTopicEventPartitions=2
+kafkaTopicProfile=LeoCdpProfile
+kafkaTopicProfilePartitions=2
+
+##### ##### ##### Data Policies ##### ##### #####
+numberOfDaysToKeepDeadVisitor=30
+maxSegmentSizeToRunInQueue=10000
+batchSizeOfSegmentDataExport=300
+
+##### ##### ##### Update Shell Script ##### ##### #####
+updateShellScriptPath=
+updateLeoSystemSecretKey=
+
 ```
 
 ---

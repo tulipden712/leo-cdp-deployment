@@ -88,29 +88,24 @@ Run **each step in order** depending on the deployment context (fresh install vs
 
 ### 1️⃣ Create Dedicated System User
 
-All LEO CDP services must run under a **non-root user** for security and process isolation.
+All LEO CDP services must run under **cdpsysuser**, a non-root user, for security and process isolation.
 
-```bash
-sudo useradd cdpsysuser -s /bin/bash -p '*'
-sudo passwd -d cdpsysuser
-sudo usermod -aG sudo cdpsysuser
-echo 'cdpsysuser ALL=(ALL) NOPASSWD: ALL' | sudo tee -a /etc/sudoers >/dev/null
-```
+Please check **setup-cdp-system-user.sh** for more details.
 
 ---
 
 ### 2️⃣ Configure SSH Access for the User
 
+> Open the file **setup-cdp-system-user.sh**
+
 ```bash
-sudo su cdpsysuser
-sudo mkdir -p /home/cdpsysuser
-cd /home/cdpsysuser
-sudo chown -R cdpsysuser:cdpsysuser /home/cdpsysuser
-mkdir .ssh
-nano .ssh/authorized_keys
+nano setup-cdp-system-user.sh
 ```
 
+![setup-cdp-system-user](docs/setup-cdp-system-user-pubkey.png "setup-cdp-system-user")
+
 > Paste your **SSH public key** here to enable passwordless access.
+
 > This user will be used for deployment, upgrades, and service management.
 
 ---
@@ -121,11 +116,11 @@ All commands should be executed as **root** or with `sudo`, before switching to 
 
 ```bash
 cd script-new-installation
-sudo bash install-java.sh        # Install Java (required)
-sudo bash install-redis.sh       # Install Redis (required)
-sudo bash install-database.sh    # Install ArangoDB
-sudo bash install-nginx.sh       # Install Nginx (reverse proxy)
-sudo bash install-certbot.sh     # Install Let's Encrypt SSL (optional)
+sudo bash install-java.sh        # Install Java (required for all services)
+sudo bash install-redis.sh       # Install Redis (required for all services)
+sudo bash install-database.sh    # Install ArangoDB (required for only database services)
+sudo bash install-nginx.sh       # Install Nginx (reverse proxy for Admin UI and Data Hub)
+sudo bash install-certbot.sh     # Install Let's Encrypt SSL (optional if use reverse proxy)
 ```
 
 ---
@@ -134,7 +129,7 @@ sudo bash install-certbot.sh     # Install Let's Encrypt SSL (optional)
 
 ```bash
 sudo su - cdpsysuser
-cd /path/to/LEO-CDP-FREE-EDITION
+cd /build/cdp-instance
 ```
 
 Generate configuration metadata:
@@ -209,14 +204,11 @@ bash run-database-upgrade.sh
 
 ## ✅ Quick Deployment Summary
 
-For a **fresh Ubuntu 22.04** server:
+For a single **fresh Ubuntu 22.04** server:
 
 ```bash
 # 1. Create dedicated system user
-sudo useradd cdpsysuser -s /bin/bash -p '*'
-sudo passwd -d cdpsysuser
-sudo usermod -aG sudo cdpsysuser
-echo 'cdpsysuser ALL=(ALL) NOPASSWD: ALL' | sudo tee -a /etc/sudoers >/dev/null
+sudo bash setup-cdp-system-user.sh
 
 # 2. Install dependencies
 cd script-new-installation
@@ -227,7 +219,9 @@ sudo bash install-nginx.sh
 
 # 3. Switch to CDP user and configure
 sudo su - cdpsysuser
-cd /path/to/LEO-CDP-FREE-EDITION
+sudo mkdir -p /build/cdp-instance
+sudo chown -R cdpsysuser:cdpsysuser /build/cdp-instance
+cd /build/cdp-instance
 bash setup-leocdp-metadata.sh
 bash setup-leocdp-database.sh
 

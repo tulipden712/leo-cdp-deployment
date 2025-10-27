@@ -1,6 +1,7 @@
 import requests
 import json
 from datetime import datetime
+import pytz
 import sys
 import os
 import traceback
@@ -13,6 +14,7 @@ from pipeline_config import DAG_TEMP_DATA_FOLDER
 
 file_path = DAG_TEMP_DATA_FOLDER
 EXPIRED_TIME = 15
+TIME_ZONE_VIETNAM = 'Asia/Ho_Chi_Minh'
 
 def ensure_folder_exists(folder_path):
     if not os.path.exists(folder_path):
@@ -32,7 +34,7 @@ ensure_folder_exists(file_processor)
 
 # Configure Redis connection
 
-timestamp = datetime.now(timezone('Asia/Ho_Chi_Minh')).strftime("%Y%m%d_%H%M%S")
+timestamp = datetime.now(timezone(TIME_ZONE_VIETNAM)).strftime("%Y%m%d_%H%M%S")
 # Create a Redis client
 redis_db = connect_to_redis()
 logger = logging.getLogger('cdp_bizfly_email_synch')
@@ -44,11 +46,31 @@ def get_cdp_url(cdp_hostname):
         cdp_hostname = cdp_hostname
     return "https://" + cdp_hostname + "/api/segment/profiles?"
 
+
 def convert_to_bizfly_time(date):
     try:
-        return datetime.strptime(date, "%b %d, %Y, %I:%M:%S %p").strftime("%d/%m/%Y")
+        return convert_to_vietnam_timezone(date)
     except:
-        return datetime.strptime(date, "%b %d, %y, %I:%M:%S %p").strftime("%d/%m/%Y")
+        return convert_to_vietnam_timezone(date)
+
+def convert_to_vietnam_timezone(date_string):
+    # Parse the datetime string to a datetime object
+    original_datetime = datetime.strptime(date_string, "%b %d, %Y, %I:%M:%S %p")
+
+    # Define the original timezone (assuming the input is in UTC)
+    original_tz = pytz.timezone('UTC')
+
+    # Localize the datetime to the original timezone
+    localized_datetime = original_tz.localize(original_datetime)
+
+    # Convert the localized datetime to Ho Chi Minh timezone
+    
+    hcm_tz = pytz.timezone(TIME_ZONE_VIETNAM)
+    hcm_datetime = localized_datetime.astimezone(hcm_tz)
+
+    # Format the datetime to a string in "dd/MM/yyyy" format
+    hcm_datetime_str = hcm_datetime.strftime('%d/%m/%Y')
+    return hcm_datetime_str
 
 
 def cdp_profile(json_detail):

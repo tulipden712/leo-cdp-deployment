@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 
-CLIENT_CODE = 'dgv'
+CLIENT_CODE = ''
 BIZFLY_BASE_URL_CONTACT = "https://apicampaign.bizfly.vn/api/customer/contact/import"
 
 class BizflyConfig:

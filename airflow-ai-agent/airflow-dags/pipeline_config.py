@@ -1,6 +1,6 @@
 
 
-DAG_TEMP_DATA_FOLDER = "/home/thomas/0-github/leo-cdp/airflow-dags/logs/"
+DAG_TEMP_DATA_FOLDER = "./logs/"
 
 ########################################
 

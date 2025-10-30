@@ -22,43 +22,42 @@ LEO CDP Free Edition provides a complete environment to manage customer data, in
 
 ```
 .
-├── airflow-dags/                     # Example Airflow DAGs for data pipelines
-├── chrome-ext/                       # Chrome extensions for tracking and event testing
-├── configs/                          # Configuration of LEO CDP services
-├── data/                             # Local or exported data files
-├── deps/                             # Library dependencies
-├── devops-script/                    # Scripts for maintenance and automation
-├── docs/                             # Documentation and diagrams
-├── public/                           # Static resources for Admin UI
-├── resources/                        # Additional assets or sample files
-├── script-new-installation/          # Main installation scripts for system setup
-│   ├── install-certbot.sh            # Install Let's Encrypt SSL certs
-│   ├── install-database.sh           # Install ArangoDB 3.11+
-│   ├── install-java.sh               # Install Amazon Corretto / OpenJDK 11
-│   ├── install-nginx.sh              # Install stable Nginx reverse proxy
-│   └── install-redis.sh              # Install Redis for caching and job state
-├── static-data/                      # Example static data sets
+CDP.RELEASE/
 │
-├── leo-data-processing-starter-v_0.9.0.jar
+├── chrome-ext/     # Browser extension for tracking support
+├── configs/      # Environment configuration (env, database, app.yml, etc.)
+├── data/        # Demo data or initialization samples
+├── deps/        # Dependency libraries (JARs, scripts, etc.)
+├── devops-script/   # CI/CD or Azure DevOps pipeline scripts
+├── docs/        # Deployment and technical documentation
+├── public/       # Static assets, logos, HTML templates
+├── resources/     # Internal configuration files (properties, metadata)
+├── script-new-installation/ # Installation package for fresh setup
+├── static-data/     # Sample dataset, e.g.,sample-fake-customer.csv, GeoIP2,..
+│
+├── leocdp-dev-start.sh  # Start all services in the development environment
+├── run-database-backup-restore.sh # Backup and restore database data
+├── run-database-upgrade.sh  # Upgrade database schema
+│
+├── setup-arangodb3-client.sh # Install ArangoDB client
+├── setup-cdp-system-user.sh  # Create the LEO system user
+├── setup-leocdp-database.sh  # Set up ArangoDB schema
+├── setup-leocdp-metadata.sh  # Load initial system metadata
+├── setup-leocdp-single-node.sh # Configure single-node deployment
+├── setup-leocdp.sh    # Main script for initializing the entire system
+│
+├── start-admin.sh    # Start the Admin service
+├── start-data-connector-jobs.sh # Start data connector jobs
+├── start-observer.sh    # Start the Observer service
+├── stop-server.sh     # Stop all running services
+│
 ├── leo-main-starter-v_0.9.0.jar
+├── leo-data-processing-starter-v_0.9.0.jar
 ├── leo-observer-starter-v_0.9.0.jar
 ├── leo-scheduler-starter-v_0.9.0.jar
 │
-├── leocdp-metadata.properties        # Active runtime metadata config
-├── leocdp-metadata-tpl.properties    # Template metadata configuration
-│
-├── run-database-backup-restore.sh    # Backup and restore ArangoDB
-├── run-database-upgrade.sh           # Schema upgrade utility
-│
-├── setup-leocdp-database.sh          # Initialize CDP database
-├── setup-leocdp-metadata.sh          # Generate metadata configuration file
-│
-├── start-admin.sh                    # Start Admin service
-├── start-observer.sh                 # Start Data Hub / Observer service
-├── start-data-connector-jobs.sh      # Start background ETL/sync jobs
-├── stop-server.sh                    # Stop all running CDP services
-│
 └── README.md
+
 ```
 
 ---
@@ -70,7 +69,7 @@ LEO CDP Free Edition provides a complete environment to manage customer data, in
 | OS            | Ubuntu 22.04 LTS or higher               |
 | Java          | Amazon Corretto 11 *(required)*         |
 | Redis         | Redis 6+ *(required)*                    |
-| Database      | ArangoDB 3.11+                           |
+| Database      | ArangoDB 3.11.14                         |
 | Reverse Proxy | Nginx (latest stable)                    |
 | Shell         | Bash 5.0+                                |
 | Access        | Dedicated non-root user for all services |

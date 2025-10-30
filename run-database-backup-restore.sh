@@ -4,31 +4,45 @@ IFS=$'\n\t'
 
 # ----------------------------------------------------------
 # 🧠 run-database-backup-restore.sh
-# Backup and restore ArangoDB databases (Community Edition 3.11)
-# using JSON config file and DB_CONFIG_KEY
+# Backup and restore ArangoDB (Community Edition 3.11)
+# Supports manual runs and CRON-based automated backups
+# Automatically installs arangodb3-client if missing
 # ----------------------------------------------------------
-# Usage:
+# Manual usage:
 #   ./run-database-backup-restore.sh backup <config_json_path> <db_config_key> [backup_folder]
 #   ./run-database-backup-restore.sh restore <config_json_path> <db_config_key> <backup_folder>
-# Example:
-#   ./run-database-backup-restore.sh backup /configs/DEV-database-configs.json localCdpDbConfigs
+#
+# CRON usage (auto defaults):
+#   0 3 * * * /build/cdp-instance/run-database-backup-restore.sh backup >> /var/log/leocdp-backup.log 2>&1
 # ----------------------------------------------------------
 
-# --- Validate args ---
-if [[ $# -lt 3 ]]; then
+# --- Always work from /build/cdp-instance ---
+cd /build/cdp-instance || {
+  echo "❌ Cannot change directory to /build/cdp-instance"
+  exit 1
+}
+
+# --- Detect invocation mode ---
+if [[ $# -lt 1 ]]; then
   echo "Usage:"
   echo "  $0 backup <config_json_path> <db_config_key> [backup_folder]"
-  echo "  $0 restore <config_json_path> <db_config_key> <backup_folder>"
-  echo "Example:"
-  echo "  $0 backup /configs/DEV-database-configs.json localCdpDbConfigs"
+  echo "  $0 restore <config_json_path> <db_config_key> <backup_folder]"
   exit 1
 fi
 
-# --- Parameters ---
 COMMAND="$1"
-CONFIG_PATH="$2"
-DB_CONFIG_KEY="$3"
-BACKUP_FOLDER="${4:-}"
+
+# --- Determine default or user-provided params ---
+if [[ $# -ge 3 ]]; then
+  CONFIG_PATH="$2"
+  DB_CONFIG_KEY="$3"
+  BACKUP_FOLDER="${4:-}"
+else
+  CONFIG_PATH="configs/PRO-database-configs.json"
+  DB_CONFIG_KEY="cdpDbConfigs"
+  DATE_TAG=$(date '+%Y-%m-%d-%H-%M')
+  BACKUP_FOLDER="/home/cdpsysuser/backup-${DATE_TAG}"
+fi
 
 # --- Constants ---
 BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -38,12 +52,30 @@ timestamp() { date '+%Y-%m-%d %H:%M:%S'; }
 log() { echo "[$(timestamp)] $*" | tee -a "$LOG_FILE"; }
 
 # --- Verify required tools ---
-for bin in jq arangodump arangorestore nc; do
-  if ! command -v "$bin" >/dev/null 2>&1; then
-    log "❌ Required tool '$bin' not found. Please install it."
-    exit 1
+check_tools() {
+  local missing_tools=()
+  for bin in jq arangodump arangorestore nc; do
+    if ! command -v "$bin" >/dev/null 2>&1; then
+      missing_tools+=("$bin")
+    fi
+  done
+
+  if [[ ${#missing_tools[@]} -gt 0 ]]; then
+    log "⚠️ Missing tools: ${missing_tools[*]}"
+    if [[ -x "./setup-arangodb3-client.sh" ]]; then
+      log "🔧 Running setup-arangodb3-client.sh to install missing tools..."
+      ./setup-arangodb3-client.sh || {
+        log "❌ Failed to install ArangoDB client tools."
+        exit 1
+      }
+      log "✅ ArangoDB client tools installed successfully."
+    else
+      log "❌ setup-arangodb3-client.sh not found or not executable."
+      exit 1
+    fi
   fi
-done
+}
+check_tools
 
 # --- Validate config file ---
 if [[ ! -f "$CONFIG_PATH" ]]; then
@@ -66,7 +98,7 @@ fi
 
 ENDPOINT="tcp://${ARANGO_HOST}:${ARANGO_PORT}"
 
-# --- Set default backup folder for CRON ---
+# --- Default backup folder ---
 if [[ -z "$BACKUP_FOLDER" && "$COMMAND" == "backup" ]]; then
   DATE_TAG=$(date '+%Y_%m_%d_%H%M')
   BACKUP_FOLDER="${BASE_DIR}/backup_${ARANGO_DB}_${DATE_TAG}"
@@ -80,6 +112,7 @@ log "Database  : $ARANGO_DB"
 log "Host      : $ARANGO_HOST:$ARANGO_PORT"
 log "User      : $ARANGO_USER"
 log "BackupDir : ${BACKUP_FOLDER:-<not applicable>}"
+log "Mode      : $( [[ $# -ge 3 ]] && echo 'Manual' || echo 'CRON' )"
 log "----------------------------------------------------------"
 
 # --- Check ArangoDB connectivity ---

@@ -8,7 +8,7 @@ LEO_CDP_FOLDER="/build/cdp-instance"
 BUILD_VERSION="v_0.9.0"
 
 # Multiple router keys (space- or comma-separated)
-HTTP_ROUTER_KEYS="datahub datahub_backup1 datahub_backup2"
+HTTP_ROUTER_KEYS="datahub1 datahub2 datahub3"
 
 JAR_MAIN="leo-observer-starter-${BUILD_VERSION}.jar"
 JVM_PARAMS="-Xms256m -Xmx1500m -XX:+TieredCompilation -XX:+UseCompressedOops -XX:+DisableExplicitGC -XX:+UseNUMA -server"

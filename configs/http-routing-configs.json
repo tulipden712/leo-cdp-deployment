@@ -2,29 +2,29 @@
 	"map": {
 		"Admin--------------------------------------------" : {"" : "---------------------------------" },
 		
-		"leocdp_admin -  MainHttpRouter ------------" : {"notes" : "Default LEO CDP - Admin Dashboard" },
-		"leocdp_admin": {
+		"leocdp_admin1 -  MainHttpRouter ------------" : {"notes" : "Default LEO CDP - Admin Dashboard" },
+		"leocdp_admin1": {
 			"name": "MainHttpWorker-0",
-			"host": "cdpsys.admin",
-			"port": 9070,
-			"classNameHttpRouter": "leotech.starter.router.MainHttpRouter",
-			"bodyHandlerEnabled": true,
-			"sockJsHandlerEnabled": true
-		},
-		"leocdp_admin_backup1 -  MainHttpRouter ------------" : {"notes" : "Backup 1 LEO CDP - Admin Dashboard" },
-		"leocdp_admin_backup1": {
-			"name": "MainHttpWorker-1",
 			"host": "cdpsys.admin",
 			"port": 9071,
 			"classNameHttpRouter": "leotech.starter.router.MainHttpRouter",
 			"bodyHandlerEnabled": true,
 			"sockJsHandlerEnabled": true
 		},
-		"leocdp_admin_backup2 -  MainHttpRouter ------------" : {"notes" : "Backup 2 LEO CDP - Admin Dashboard" },
-		"leocdp_admin_backup2": {
-			"name": "MainHttpWorker-2",
+		"leocdp_admin2 -  MainHttpRouter ------------" : {"notes" : "Backup 1 LEO CDP - Admin Dashboard" },
+		"leocdp_admin2": {
+			"name": "MainHttpWorker-1",
 			"host": "cdpsys.admin",
 			"port": 9072,
+			"classNameHttpRouter": "leotech.starter.router.MainHttpRouter",
+			"bodyHandlerEnabled": true,
+			"sockJsHandlerEnabled": true
+		},
+		"leocdp_admin3 -  MainHttpRouter ------------" : {"notes" : "Backup 2 LEO CDP - Admin Dashboard" },
+		"leocdp_admin3": {
+			"name": "MainHttpWorker-2",
+			"host": "cdpsys.admin",
+			"port": 9073,
 			"classNameHttpRouter": "leotech.starter.router.MainHttpRouter",
 			"bodyHandlerEnabled": true,
 			"sockJsHandlerEnabled": true
@@ -32,17 +32,8 @@
 		
 		"Observer--------------------------------------------" : {"" : "---------------------------------" },
 
-		"datahub -  ObserverHttpRouter ------------" : {"notes" : "Default Leo CDP - Data Observer" },
-		"datahub": {
-			"name": "LeoObserverHttp-0",
-			"host": "cdpsys.datahub",
-			"port": 9080,
-			"classNameHttpRouter": "leotech.starter.router.ObserverHttpRouter",
-			"bodyHandlerEnabled": true,
-			"sockJsHandlerEnabled": false
-		},
-		"datahub_backup1 -  ObserverHttpRouter ------------" : {"notes" : "Backup 1 Leo CDP - Data Observer" },
-		"datahub_backup1": {
+		"datahub1 -  ObserverHttpRouter ------------" : {"notes" : "Default Leo CDP - Data Observer" },
+		"datahub1": {
 			"name": "LeoObserverHttp-1",
 			"host": "cdpsys.datahub",
 			"port": 9081,
@@ -50,11 +41,20 @@
 			"bodyHandlerEnabled": true,
 			"sockJsHandlerEnabled": false
 		},
-		"datahub_backup2 -  ObserverHttpRouter ------------" : {"notes" : "Backup 2 Leo CDP - Data Observer" },
-		"datahub_backup2": {
+		"datahub2 -  ObserverHttpRouter ------------" : {"notes" : "Backup 1 Leo CDP - Data Observer" },
+		"datahub2": {
 			"name": "LeoObserverHttp-2",
 			"host": "cdpsys.datahub",
 			"port": 9082,
+			"classNameHttpRouter": "leotech.starter.router.ObserverHttpRouter",
+			"bodyHandlerEnabled": true,
+			"sockJsHandlerEnabled": false
+		},
+		"datahub3 -  ObserverHttpRouter ------------" : {"notes" : "Backup 2 Leo CDP - Data Observer" },
+		"datahub3": {
+			"name": "LeoObserverHttp-2",
+			"host": "cdpsys.datahub",
+			"port": 9083,
 			"classNameHttpRouter": "leotech.starter.router.ObserverHttpRouter",
 			"bodyHandlerEnabled": true,
 			"sockJsHandlerEnabled": false

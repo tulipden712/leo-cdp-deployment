@@ -6,7 +6,7 @@ set -euo pipefail
 # ==========================================
 LEO_CDP_FOLDER="/build/cdp-instance"
 BUILD_VERSION="v_0.9.0"
-HTTP_ROUTER_KEYS="leocdp_admin leocdp_admin_backup1 leocdp_admin_backup2"
+HTTP_ROUTER_KEYS="leocdp_admin1 leocdp_admin2 leocdp_admin3"
 
 JAR_MAIN="leo-main-starter-${BUILD_VERSION}.jar"
 JVM_PARAMS="-Xms256m -Xmx1500m -XX:+TieredCompilation -XX:+UseCompressedOops -XX:+DisableExplicitGC -XX:+UseNUMA -server"

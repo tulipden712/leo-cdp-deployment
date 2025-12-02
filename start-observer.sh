@@ -68,4 +68,4 @@ for HTTP_ROUTER_KEY in "${ROUTER_ARRAY[@]}"; do
   echo "[$(timestamp)] --------------------------------------------" | tee -a "$LOG_FILE"
 done
 
-echo "[$(timestamp)] === All observer processes launched successfully ==="
+echo "[$(timestamp)] === All CDP Data Observer processes launched successfully ==="

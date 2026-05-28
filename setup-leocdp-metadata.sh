@@ -2,16 +2,16 @@
 set -e
 
 # --- Metadata ---
-SRC_FILE="setup-leocdp-metadata-tpl.properties"
-DEST_FILE="leocdp-metadata.properties"
+TEMPLATE_META_DATA="setup-leocdp-metadata-tpl.properties"
+FINAL_LEO_META_DATA="leocdp-metadata.properties"
 
 echo "──────────────────────────────────────────────"
 echo "🚀 LEO CDP Production Config Setup"
 echo "──────────────────────────────────────────────"
 
 # --- Check template file ---
-if [ ! -f "$SRC_FILE" ]; then
-  echo "❌ Missing template: $SRC_FILE"
+if [ ! -f "$TEMPLATE_META_DATA" ]; then
+  echo "❌ Missing template: $TEMPLATE_META_DATA"
   exit 1
 fi
 
@@ -45,7 +45,7 @@ read -rp "Backup Retention Days (default 7): " databaseBackupRetentionDays
 databaseBackupRetentionDays=${databaseBackupRetentionDays:-7}
 
 echo ""
-echo "Generating production config from $SRC_FILE ..."
+echo "Generating production config from $TEMPLATE_META_DATA ..."
 sleep 1
 
 # --- Replace placeholders in template ---
@@ -65,22 +65,22 @@ sed \
   -e "s|{{databaseBackupPath}}|${databaseBackupPath}|g" \
   -e "s|{{databaseBackupPeriodHours}}|${databaseBackupPeriodHours}|g" \
   -e "s|{{databaseBackupRetentionDays}}|${databaseBackupRetentionDays}|g" \
-  "$SRC_FILE" > "$DEST_FILE"
+  "$TEMPLATE_META_DATA" > "$FINAL_LEO_META_DATA"
 
-echo "✅ Created $DEST_FILE"
+echo "✅ Created $FINAL_LEO_META_DATA"
 
 # --- Add to .gitignore if not already ---
-if ! grep -qxF "$DEST_FILE" .gitignore 2>/dev/null; then
-  echo "$DEST_FILE" >> .gitignore
-  echo "📁 Added $DEST_FILE to .gitignore"
+if ! grep -qxF "$FINAL_LEO_META_DATA" .gitignore 2>/dev/null; then
+  echo "$FINAL_LEO_META_DATA" >> .gitignore
+  echo "📁 Added $FINAL_LEO_META_DATA to .gitignore"
 fi
 
 # --- Confirm result ---
 echo "\n ───────────────────────────────────────────"
 echo "✅ LEO CDP production metadata generated."
-echo "📄 Path: $(realpath "$DEST_FILE")"
+echo "📄 Path: $(realpath "$FINAL_LEO_META_DATA")"
 echo "──────────────────────────────────────────────"
 echo "Preview of generated file:"
 echo "──────────────────────────────────────────────"
-head -n 30 "$DEST_FILE"
+head -n 30 "$FINAL_LEO_META_DATA"
 echo "──────────────────────────────────────────────"

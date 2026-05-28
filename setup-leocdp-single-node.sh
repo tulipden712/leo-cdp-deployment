@@ -15,7 +15,7 @@ echo "  🚀 LEO CDP for Single Node - New Installation Started"
 echo "=============================================="
 
 # 1. Create system user (idempotent)
-bash setup-cdp-system-user.sh
+bash setup-system-user.sh
 
 # 2. Install system dependencies
 cd script-new-installation

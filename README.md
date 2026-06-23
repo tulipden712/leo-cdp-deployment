@@ -40,7 +40,7 @@ CDP.RELEASE/
 ├── run-database-upgrade.sh  # Upgrade database schema
 │
 ├── setup-arangodb3-client.sh # Install ArangoDB client
-├── setup-cdp-system-user.sh  # Create the LEO system user
+├── setup-system-user.sh  # Create the system user for this CDP instance 
 ├── setup-leocdp-database.sh  # Set up ArangoDB schema
 ├── setup-leocdp-metadata.sh  # Load initial system metadata
 ├── setup-leocdp-single-node.sh # Configure single-node deployment
@@ -89,16 +89,16 @@ Run **each step in order** depending on the deployment context (fresh install vs
 
 All LEO CDP services must run under **cdpsysuser**, a non-root user, for security and process isolation.
 
-Please check **setup-cdp-system-user.sh** for more details.
+Please check **setup-system-user.sh** for more details.
 
 ---
 
 ### 2️⃣ Configure SSH Access for the User
 
-> Open the file **setup-cdp-system-user.sh**
+> Open the file **setup-system-user.sh**
 
 ```bash
-nano setup-cdp-system-user.sh
+nano setup-system-user.sh
 ```
 
 ![setup-cdp-system-user](docs/setup-cdp-system-user-pubkey.png "setup-cdp-system-user")

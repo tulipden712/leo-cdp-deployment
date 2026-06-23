@@ -7,11 +7,12 @@ set -euo pipefail
 # - Checks if ArangoDB is installed
 # - Asks user confirmation for LEO CDP server
 # - Installs ArangoDB 3.11.14 if not present
+# NOTE: ArangoDB 3.11 reached EOL and its GPG key expired in early 2026.
+#       This script uses [trusted=yes] to bypass the invalid EXPKEYSIG error.
 # -----------------------------
 
 ARANGO_VERSION="3.11.14-1"
 ARANGO_REPO_LIST="/etc/apt/sources.list.d/arangodb.list"
-ARANGO_KEYRING_PATH="/usr/share/keyrings/arangodb-archive-keyring.gpg"
 
 echo "🔍 Checking for existing ArangoDB installation..."
 
@@ -32,34 +33,27 @@ echo "📦 Proceeding with ArangoDB ${ARANGO_VERSION} installation..."
 
 # Ensure required dependencies
 sudo apt-get update -qq
-sudo apt-get install -y curl gnupg apt-transport-https ca-certificates
+sudo apt-get install -y curl apt-transport-https ca-certificates
 
-# Add ArangoDB GPG key if not already present
-if [ ! -f "$ARANGO_KEYRING_PATH" ]; then
-  echo "🔑 Adding ArangoDB GPG key..."
-  curl -fsSL https://download.arangodb.com/arangodb311/DEBIAN/Release.key | sudo gpg --dearmor -o "$ARANGO_KEYRING_PATH"
-else
-  echo "🔑 GPG key already exists, skipping."
-fi
+# Overwrite the ArangoDB repository list to bypass the expired GPG key.
+# By using [trusted=yes], APT will ignore the expired EXPKEYSIG signature.
+# This replaces the previous configuration that caused the failure.
+echo "🧩 Configuring ArangoDB repository (GPG verification disabled due to EOL)..."
+echo "deb [trusted=yes] https://download.arangodb.com/arangodb311/DEBIAN/ /" \
+  | sudo tee "$ARANGO_REPO_LIST" >/dev/null
 
-# Add ArangoDB repository if not already configured
-if [ ! -f "$ARANGO_REPO_LIST" ]; then
-  echo "🧩 Adding ArangoDB repository..."
-  echo "deb [signed-by=${ARANGO_KEYRING_PATH}] https://download.arangodb.com/arangodb311/DEBIAN/ /" \
-    | sudo tee "$ARANGO_REPO_LIST" >/dev/null
-else
-  echo "🧩 Repository already configured."
-fi
-
-# Update package index
+# Update package index, explicitly allowing insecure repositories so the 
+# expired key doesn't halt the update process
 echo "🔄 Updating package index..."
-sudo apt-get update -qq
+sudo apt-get update -qq --allow-insecure-repositories
 
-# Install specific version of ArangoDB
+# Install the specific version of ArangoDB. 
+# The --allow-unauthenticated flag ensures APT doesn't pause to prompt for 
+# manual confirmation regarding the untrusted repository.
 echo "☕ Installing ArangoDB ${ARANGO_VERSION}..."
-sudo apt-get install -y "arangodb3=${ARANGO_VERSION}"
+sudo apt-get install -y --allow-unauthenticated "arangodb3=${ARANGO_VERSION}"
 
-# Verify installation
+# Verify the installation was successful
 echo "✅ Verifying ArangoDB installation..."
 arangod --version
 

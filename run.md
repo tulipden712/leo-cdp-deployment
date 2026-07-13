@@ -44,7 +44,7 @@ Port trên host (OpenResty proxy vào đây):
 
 ```bash
 # Chạy setup trong container admin (hoặc máy có Java 11 + cùng configs)
-docker compose exec leocdp-admin java -jar /app/app.jar setup-system-with-password 'M1@26@cdp'
+docker compose exec leocdp-admin java -jar /app/app.jar setup-system-with-password 'YOUR_SUPERADMIN_PASSWORD'
 ```
 
 ## 5. OpenResty

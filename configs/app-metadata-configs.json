@@ -2,7 +2,7 @@
   {
     "appId": "10000",
     "name": "CDP Admin",
-    "domain": "103.252.122.56:8600",
+    "domain": "m1cdp.mediaone.dev",
     "pageTitle": "CDP Admin",
     "pageHeaderLogo": "https://www.the-learning-agency-lab.com/wp-content/uploads/2021/04/TheLearningAgency_Black_Logo20_XL.png",
     "webTemplateFolder": "leocdp-admin",

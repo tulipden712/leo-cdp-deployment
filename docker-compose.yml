@@ -30,11 +30,16 @@ services:
     networks:
       - leocdp-net
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8529/_api/version"]
+      # Image ArangoDB thường không có curl; /_api/version cần auth khi có password
+      test:
+        [
+          "CMD-SHELL",
+          "arangosh --server.endpoint tcp://127.0.0.1:8529 --server.username root --server.password \"$$ARANGO_ROOT_PASSWORD\" --javascript.execute-string 'db._version()' || exit 1",
+        ]
       interval: 15s
-      timeout: 5s
+      timeout: 10s
       retries: 10
-      start_period: 30s
+      start_period: 45s
     # KHÔNG map port ra host — chỉ dùng nội bộ.
     # Nếu cần Arango Web UI tạm thời, mở comment:
     # ports:

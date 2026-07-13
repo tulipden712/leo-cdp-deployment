@@ -85,6 +85,8 @@ services:
       HTTP_ROUTER_KEY: ${HTTP_ROUTER_KEY:-leocdp_admin1}
       JAVA_OPTS: "-Xms512m -Xmx1536m"
     volumes:
+      # MANIFEST Class-Path trỏ deps/*.jar cạnh app.jar
+      - ./deps:/app/deps:ro
       - ./configs:/app/configs:ro
       - ./resources:/app/resources:ro
       - ./public:/app/public
@@ -115,6 +117,7 @@ services:
       HTTP_ROUTER_KEY: ${HTTP_ROUTER_KEY1:-datahub1}
       JAVA_OPTS: "-Xms512m -Xmx1024m"
     volumes:
+      - ./deps:/app/deps:ro
       - ./configs:/app/configs:ro
       - ./resources:/app/resources:ro
       - ./public:/app/public:ro
@@ -145,6 +148,7 @@ services:
       JOB_NAME: ${SCHEDULER_JOB_NAME:-DataConnectorScheduler}
       JAVA_OPTS: "-Xms256m -Xmx768m"
     volumes:
+      - ./deps:/app/deps:ro
       - ./configs:/app/configs:ro
       - ./resources:/app/resources:ro
       - ./data:/app/data:ro
@@ -171,6 +175,7 @@ services:
       JOB_NAME: ${CONNECTOR_JOB_NAME:-}
       JAVA_OPTS: "-Xms256m -Xmx768m"
     volumes:
+      - ./deps:/app/deps:ro
       - ./configs:/app/configs:ro
       - ./resources:/app/resources:ro
       - ./static-data:/app/static-data:ro

@@ -1,21 +1,32 @@
 [
-    {
-      "appId": "10000",
-      "name": "CDP Admin",
-      "pageTitle": "CDP Admin",
-      "pageHeaderLogo": "https://www.the-learning-agency-lab.com/wp-content/uploads/2021/04/TheLearningAgency_Black_Logo20_XL.png",
-      "webTemplateFolder": "leocdp-admin",
-      "webTemplateCache": false,
-      "dataApiCache": false
-    },
-    {
-      "appId": "1",
-      "name": "CDP Content Hub",
-      "domain": "localhost",
-      "pageTitle": "CDP Content Hub",
-      "pageHeaderLogo": "/public/images/leo-cdp-logo.png",
-      "webTemplateFolder": "content-hub",
-      "webTemplateCache": true,
-      "dataApiCache": true
-    }
-  ]
+  {
+    "appId": "10000",
+    "name": "CDP Admin",
+    "domain": "103.252.122.56:8600",
+    "pageTitle": "CDP Admin",
+    "pageHeaderLogo": "https://www.the-learning-agency-lab.com/wp-content/uploads/2021/04/TheLearningAgency_Black_Logo20_XL.png",
+    "webTemplateFolder": "leocdp-admin",
+    "webTemplateCache": false,
+    "dataApiCache": false
+  },
+  {
+    "appId": "10000",
+    "name": "CDP Admin",
+    "domain": "127.0.0.1:8600",
+    "pageTitle": "CDP Admin",
+    "pageHeaderLogo": "https://www.the-learning-agency-lab.com/wp-content/uploads/2021/04/TheLearningAgency_Black_Logo20_XL.png",
+    "webTemplateFolder": "leocdp-admin",
+    "webTemplateCache": false,
+    "dataApiCache": false
+  },
+  {
+    "appId": "1",
+    "name": "CDP Content Hub",
+    "domain": "localhost",
+    "pageTitle": "CDP Content Hub",
+    "pageHeaderLogo": "/public/images/leo-cdp-logo.png",
+    "webTemplateFolder": "content-hub",
+    "webTemplateCache": true,
+    "dataApiCache": true
+  }
+]

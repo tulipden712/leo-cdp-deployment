@@ -30,14 +30,10 @@ services:
     networks:
       - leocdp-net
     healthcheck:
-      # Image ArangoDB thường không có curl; /_api/version cần auth khi có password
-      test:
-        [
-          "CMD-SHELL",
-          "arangosh --server.endpoint tcp://127.0.0.1:8529 --server.username root --server.password \"$$ARANGO_ROOT_PASSWORD\" --javascript.execute-string 'db._version()' || exit 1",
-        ]
-      interval: 15s
-      timeout: 10s
+      # Chỉ kiểm tra port 8529 đã mở (tránh lỗi auth/ký tự đặc biệt trong password)
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8529'"]
+      interval: 10s
+      timeout: 5s
       retries: 10
       start_period: 45s
     # KHÔNG map port ra host — chỉ dùng nội bộ.

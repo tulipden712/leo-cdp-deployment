@@ -30,8 +30,12 @@ services:
     networks:
       - leocdp-net
     healthcheck:
-      # Chỉ kiểm tra port 8529 đã mở (tránh lỗi auth/ký tự đặc biệt trong password)
-      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8529'"]
+      # Image arangodb không có bash; dùng wget (có sẵn) + basic auth
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O /dev/null --user=root --password=\"$$ARANGO_ROOT_PASSWORD\" http://127.0.0.1:8529/_api/version",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10

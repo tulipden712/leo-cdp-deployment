@@ -1,0 +1,16 @@
+# Dockerfile.data-connector — LEO CDP Data Connector Jobs
+FROM amazoncorretto:11-al2023
+
+RUN yum install -y fontconfig shadow-utils && yum clean all
+
+RUN groupadd -r cdpapp && useradd -r -g cdpapp -d /app cdpapp
+
+WORKDIR /app
+
+COPY leo-data-processing-starter-v_0.9.0.jar ./app.jar
+
+RUN mkdir -p /app/logs && chown -R cdpapp:cdpapp /app
+
+USER cdpapp
+
+ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS:--Xms256m -Xmx768m} -jar /app/app.jar ${JOB_NAME:-}"]

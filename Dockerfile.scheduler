@@ -1,0 +1,17 @@
+# Dockerfile.scheduler — LEO CDP Scheduled Jobs
+FROM amazoncorretto:11-al2023
+
+RUN yum install -y fontconfig shadow-utils && yum clean all
+
+RUN groupadd -r cdpapp && useradd -r -g cdpapp -d /app cdpapp
+
+WORKDIR /app
+
+COPY leo-scheduler-starter-v_0.9.0.jar ./app.jar
+
+RUN mkdir -p /app/logs && chown -R cdpapp:cdpapp /app
+
+USER cdpapp
+
+# JOB_NAME mặc định khớp start-data-connector-jobs.sh
+ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS:--Xms256m -Xmx768m} -jar /app/app.jar ${JOB_NAME:-DataConnectorScheduler}"]

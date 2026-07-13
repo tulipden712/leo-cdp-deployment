@@ -1,37 +1,37 @@
 {
 	"clusterInfoRedis": [
 		{
-			"host": "cdpsys.redis",
+			"host": "redis",
 			"port": 6379
 		}
 	],
 	"realtimeDataStats": [
 		{
-			"host": "cdpsys.redis",
+			"host": "redis",
 			"port": 6379
 		}
 	],
 	"localCache": [
 		{
-			"host": "cdpsys.redis",
+			"host": "redis",
 			"port": 6379
 		}
 	],
 	"masterCache": [
 		{
-			"host": "cdpsys.redis",
+			"host": "redis",
 			"port": 6379
 		}
 	],
 	"pubSubQueue": [
 		{
-			"host": "cdpsys.redis",
+			"host": "redis",
 			"port": 6379
 		}
 	],
 	"agentPubSubQueue": [
 		{
-			"host": "cdpsys.redis",
+			"host": "redis",
 			"port": 6379
 		}
 	]

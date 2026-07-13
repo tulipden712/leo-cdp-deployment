@@ -1,0 +1,190 @@
+##############################################################################
+# docker-compose.yml — LEO CDP (Free Edition) on-prem stack
+#
+# Ghi chú:
+#  - Không có service nginx: server dev đã có OpenResty chạy sẵn trên host,
+#    OpenResty sẽ reverse-proxy vào các port 127.0.0.1:8600 (admin) và
+#    127.0.0.1:8601 (observer).
+#  - ArangoDB và Redis KHÔNG public ra host, chỉ dùng nội bộ trong
+#    docker network "leocdp-net".
+#  - Cần chuẩn bị trước khi chạy `docker compose up -d`:
+#      1. File .env (copy từ env.example)
+#      2. configs/ đã trỏ host theo tên service Docker (arangodb, redis)
+#      3. (Lần đầu) leocdp-metadata.properties + setup database
+##############################################################################
+
+services:
+
+  # --------------------------------------------------------------------
+  # 1. ArangoDB — database chính (Document + Graph + Search)
+  # --------------------------------------------------------------------
+  arangodb:
+    image: arangodb/arangodb:3.11.14
+    container_name: leocdp-arangodb
+    restart: unless-stopped
+    environment:
+      ARANGO_ROOT_PASSWORD: ${ARANGO_ROOT_PASSWORD}
+    volumes:
+      - arangodb_data:/var/lib/arangodb3
+      - arangodb_apps:/var/lib/arangodb3-apps
+    networks:
+      - leocdp-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8529/_api/version"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    # KHÔNG map port ra host — chỉ dùng nội bộ.
+    # Nếu cần Arango Web UI tạm thời, mở comment:
+    # ports:
+    #   - "127.0.0.1:8529:8529"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+
+  # --------------------------------------------------------------------
+  # 2. Redis — cache cho Admin & Observer (nội bộ, không password)
+  # --------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: leocdp-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - leocdp-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # --------------------------------------------------------------------
+  # 3. LEO CDP Admin — Dashboard quản trị (bind 9071 trong container)
+  # --------------------------------------------------------------------
+  leocdp-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    container_name: leocdp-admin
+    restart: unless-stopped
+    depends_on:
+      arangodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      HTTP_ROUTER_KEY: ${HTTP_ROUTER_KEY:-leocdp_admin1}
+      JAVA_OPTS: "-Xms512m -Xmx1536m"
+    volumes:
+      - ./configs:/app/configs:ro
+      - ./resources:/app/resources:ro
+      - ./public:/app/public
+      - ./data:/app/data:ro
+      - ./leocdp-metadata.properties:/app/leocdp-metadata.properties:ro
+      - admin_logs:/app/logs
+    ports:
+      # Host 8600 → container 9071 (leocdp_admin1)
+      - "127.0.0.1:8600:9071"
+    networks:
+      - leocdp-net
+
+  # --------------------------------------------------------------------
+  # 4. LEO CDP Observer — nhận sự kiện tracking (bind 9081 trong container)
+  # --------------------------------------------------------------------
+  leocdp-observer:
+    build:
+      context: .
+      dockerfile: Dockerfile.observer
+    container_name: leocdp-observer
+    restart: unless-stopped
+    depends_on:
+      arangodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      HTTP_ROUTER_KEY: ${HTTP_ROUTER_KEY1:-datahub1}
+      JAVA_OPTS: "-Xms512m -Xmx1024m"
+    volumes:
+      - ./configs:/app/configs:ro
+      - ./resources:/app/resources:ro
+      - ./public:/app/public:ro
+      - ./data:/app/data:ro
+      - ./leocdp-metadata.properties:/app/leocdp-metadata.properties:ro
+      - observer_logs:/app/logs
+    ports:
+      # Host 8601 → container 9081 (datahub1)
+      - "127.0.0.1:8601:9081"
+    networks:
+      - leocdp-net
+
+  # --------------------------------------------------------------------
+  # 5. LEO CDP Scheduler — các job định kỳ
+  # --------------------------------------------------------------------
+  leocdp-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.scheduler
+    container_name: leocdp-scheduler
+    restart: unless-stopped
+    depends_on:
+      arangodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      JOB_NAME: ${SCHEDULER_JOB_NAME:-DataConnectorScheduler}
+      JAVA_OPTS: "-Xms256m -Xmx768m"
+    volumes:
+      - ./configs:/app/configs:ro
+      - ./resources:/app/resources:ro
+      - ./data:/app/data:ro
+      - ./leocdp-metadata.properties:/app/leocdp-metadata.properties:ro
+      - scheduler_logs:/app/logs
+    networks:
+      - leocdp-net
+
+  # --------------------------------------------------------------------
+  # 6. LEO Data Connector Jobs — đồng bộ dữ liệu ngoài (tùy chọn)
+  # --------------------------------------------------------------------
+  leocdp-data-connector:
+    build:
+      context: .
+      dockerfile: Dockerfile.data-connector
+    container_name: leocdp-data-connector
+    restart: unless-stopped
+    depends_on:
+      arangodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      JOB_NAME: ${CONNECTOR_JOB_NAME:-}
+      JAVA_OPTS: "-Xms256m -Xmx768m"
+    volumes:
+      - ./configs:/app/configs:ro
+      - ./resources:/app/resources:ro
+      - ./static-data:/app/static-data:ro
+      - ./data:/app/data:ro
+      - ./leocdp-metadata.properties:/app/leocdp-metadata.properties:ro
+      - connector_logs:/app/logs
+    networks:
+      - leocdp-net
+    # profiles: ["jobs"]  # bỏ comment nếu muốn chỉ start khi: --profile jobs
+
+networks:
+  leocdp-net:
+    driver: bridge
+
+volumes:
+  arangodb_data:
+  arangodb_apps:
+  redis_data:
+  admin_logs:
+  observer_logs:
+  scheduler_logs:
+  connector_logs:

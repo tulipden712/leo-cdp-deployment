@@ -1,0 +1,22 @@
+# Dockerfile.admin — LEO CDP Admin Dashboard
+FROM amazoncorretto:11-al2023
+
+RUN yum install -y fontconfig shadow-utils curl && yum clean all
+
+RUN groupadd -r cdpapp && useradd -r -g cdpapp -d /app cdpapp
+
+WORKDIR /app
+
+COPY leo-main-starter-v_0.9.0.jar ./app.jar
+
+RUN mkdir -p /app/logs && chown -R cdpapp:cdpapp /app
+
+USER cdpapp
+
+EXPOSE 9071
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=5 \
+    CMD curl -f http://127.0.0.1:9071/ || exit 1
+
+# HTTP_ROUTER_KEY = key trong configs/http-routing-configs.json (vd: leocdp_admin1)
+ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS:--Xms512m -Xmx1536m} -jar /app/app.jar ${HTTP_ROUTER_KEY}"]

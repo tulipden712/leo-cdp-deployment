@@ -1,11 +1,11 @@
 {
   "configs": {
     "cdpDbConfigs": {
-      "username": "",
-      "password": "",
-      "database": "",
-      "host": "cdpsys.database",
-      "port": 8600,
+      "username": "root",
+      "password": "M1@2026@LeoCDP",
+      "database": "leo_cdp",
+      "host": "arangodb",
+      "port": 8529,
       "dbdriver": "arangodb",
       "dbdriverclasspath": "com.arangodb.ArangoDB",
       "enabled": true,

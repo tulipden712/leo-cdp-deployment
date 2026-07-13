@@ -120,7 +120,7 @@ services:
       - ./deps:/app/deps:ro
       - ./configs:/app/configs:ro
       - ./resources:/app/resources:ro
-      - ./public:/app/public:ro
+      - ./public:/app/public
       - ./data:/app/data:ro
       - ./leocdp-metadata.properties:/app/leocdp-metadata.properties:ro
       - observer_logs:/app/logs

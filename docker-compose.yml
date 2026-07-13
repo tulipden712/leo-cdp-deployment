@@ -158,7 +158,8 @@ services:
       - leocdp-net
 
   # --------------------------------------------------------------------
-  # 6. LEO Data Connector Jobs — đồng bộ dữ liệu ngoài (tùy chọn)
+  # 6. LEO Data Connector Jobs — cần JOB_NAME (LeoCdpEventProcessingJob | LeoCdpProfileProcessingJob)
+  # Chỉ start khi: docker compose --profile jobs up -d
   # --------------------------------------------------------------------
   leocdp-data-connector:
     build:
@@ -166,13 +167,14 @@ services:
       dockerfile: Dockerfile.data-connector
     container_name: leocdp-data-connector
     restart: unless-stopped
+    profiles: ["jobs"]
     depends_on:
       arangodb:
         condition: service_healthy
       redis:
         condition: service_healthy
     environment:
-      JOB_NAME: ${CONNECTOR_JOB_NAME:-}
+      JOB_NAME: ${CONNECTOR_JOB_NAME:-LeoCdpEventProcessingJob}
       JAVA_OPTS: "-Xms256m -Xmx768m"
     volumes:
       - ./deps:/app/deps:ro
@@ -184,7 +186,6 @@ services:
       - connector_logs:/app/logs
     networks:
       - leocdp-net
-    # profiles: ["jobs"]  # bỏ comment nếu muốn chỉ start khi: --profile jobs
 
 networks:
   leocdp-net:

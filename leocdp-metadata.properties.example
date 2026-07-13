@@ -2,12 +2,13 @@
 
 superAdminEmail=admin@example.com
 
-httpObserverDomain=http://127.0.0.1:8601
-httpLeoBotDomain=http://127.0.0.1:8601
+# Chỉ host[:port], KHÔNG thêm http:// / ws:// (app tự ghép scheme)
+httpObserverDomain=127.0.0.1:8601
+httpLeoBotDomain=127.0.0.1:8601
 httpLeoBotApiKey=change-me
 
-httpAdminDomain=http://127.0.0.1:8600
-webSocketDomain=ws://127.0.0.1:8600
+httpAdminDomain=127.0.0.1:8600
+webSocketDomain=127.0.0.1:8600
 adminLogoUrl=
 
 smtpHost=smtp.example.com

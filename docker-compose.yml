@@ -94,8 +94,8 @@ services:
       - ./leocdp-metadata.properties:/app/leocdp-metadata.properties:ro
       - admin_logs:/app/logs
     ports:
-      # Host 8600 → container 9071 (leocdp_admin1)
-      - "127.0.0.1:8600:9071"
+      # 0.0.0.0 = truy cập được từ IP public (dev/test). Production nên bind 127.0.0.1 + reverse proxy.
+      - "8600:9071"
     networks:
       - leocdp-net
 
@@ -125,8 +125,7 @@ services:
       - ./leocdp-metadata.properties:/app/leocdp-metadata.properties:ro
       - observer_logs:/app/logs
     ports:
-      # Host 8601 → container 9081 (datahub1)
-      - "127.0.0.1:8601:9081"
+      - "8601:9081"
     networks:
       - leocdp-net
 

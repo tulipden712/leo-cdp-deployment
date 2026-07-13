@@ -30,11 +30,11 @@ services:
     networks:
       - leocdp-net
     healthcheck:
-      # Image arangodb không có bash; dùng wget (có sẵn) + basic auth
+      # BusyBox wget không có --user/--password; 401 cũng chứng tỏ HTTP đã sẵn sàng
       test:
         [
           "CMD-SHELL",
-          "wget -q -O /dev/null --user=root --password=\"$$ARANGO_ROOT_PASSWORD\" http://127.0.0.1:8529/_api/version",
+          "wget -q -S -O /dev/null http://127.0.0.1:8529/_api/version 2>&1 | grep -q HTTP",
         ]
       interval: 10s
       timeout: 5s

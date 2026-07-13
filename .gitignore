@@ -35,3 +35,4 @@ leocdp-metadata.properties
 .env
 configs/PRO-database-configs.json
 configs/*
+run.md

@@ -1,7 +1,8 @@
 # Dockerfile.observer — LEO CDP Event Observer (Data Hub)
 FROM amazoncorretto:11-al2023
 
-RUN yum install -y fontconfig shadow-utils curl && yum clean all
+# curl-minimal đã có sẵn trên amazoncorretto:11-al2023 (đủ cho HEALTHCHECK)
+RUN yum install -y fontconfig shadow-utils && yum clean all
 
 RUN groupadd -r cdpapp && useradd -r -g cdpapp -d /app cdpapp
 
